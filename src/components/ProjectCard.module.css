@@ -1,0 +1,76 @@
+.card {
+  position: absolute;
+  width: clamp(140px, var(--w), 90vw);
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.6s ease, box-shadow 0.6s ease, z-index 0s;
+  will-change: transform;
+  z-index: 1;
+  transform: rotate(var(--rotate, 0deg));
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.card:hover {
+  transform: translate(-50%, -50%) rotate(var(--rotate, 0deg)) scale(1.1) !important;
+  z-index: 100;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.card:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+
+/*.imageWrap {
+  width: 100%;
+  overflow: hidden;
+  background: #111;
+}*/
+.imageWrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: #111;
+}
+
+.imageWrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.card:hover .footer {
+  opacity: 1;
+}
+
+.title {
+  font-weight: 500;
+  text-transform: uppercase;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 28px;
+  letter-spacing: 0.03em;
+  color: #111;
+}
+
+.year {
+  opacity: 0.5;
+  flex-shrink: 0;
+  margin-left: 8px;
+}

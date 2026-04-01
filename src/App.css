@@ -1,0 +1,290 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #d9d4cc;
+  --ink: #111;
+  --accent: #c0392b;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  background-image: url('./assets/fondo.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: 'DM Mono', monospace;
+  overflow: hidden;
+  cursor:  url('./assets/cursor.png');
+}
+
+/* ── Scatter canvas ─────────────────────────────────── */
+.scatter-canvas {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.scatter-canvas .project-card-wrapper {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.scatter-canvas:not(.visible) article {
+  opacity: 0 !important;
+}
+
+/* ── Firma / logo ───────────────────────────────────── */
+.site-name {
+  position: fixed;
+  bottom: 28px;
+  right: 32px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 13px;
+  line-height: 1.3;
+  text-align: right;
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 200;
+  text-transform: none;
+}
+
+/* ── Página de proyecto ─────────────────────────────── */
+.project-page {
+  min-height: 100vh;
+  padding: clamp(32px, 8vw, 100px) clamp(24px, 6vw, 80px);
+  overflow-y: auto;
+  cursor: default;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: var(--ink);
+  margin-bottom: 48px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  padding: 0;
+}
+
+.back-btn:hover {
+  opacity: 1;
+}
+
+.project-page h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(32px, 6vw, 80px);
+  font-weight: 400;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.project-year {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  opacity: 0.4;
+  margin-bottom: 40px;
+  letter-spacing: 0.1em;
+}
+
+.project-img {
+  max-width: 640px;
+  width: 100%;
+  display: block;
+  margin-bottom: 32px;
+}
+
+.project-placeholder {
+  font-size: 13px;
+  opacity: 0.45;
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+
+/* ── Responsive: pantallas pequeñas ─────────────────── */
+@media (max-width: 600px) {
+  body {
+    overflow: auto;          /* permite scroll en móvil */
+  }
+
+  .scatter-canvas {
+    height: auto;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+}
+/* ── Project layout ─────────────────────────────── */
+.project-layout {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 100vh;
+  overflow-y: auto;
+  cursor: default;
+}
+
+.project-nav {
+  position: fixed;
+  top: 24px;
+  left: 40px;
+  display: flex;
+  gap: 8px;
+  z-index: 100;
+}
+
+.nav-btn {
+  background: rgba(242, 237, 232, 0.92); 
+  border: 1.5px solid var(--ink);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: var(--ink);
+  padding: 5px 10px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.nav-btn:hover {
+  background: var(--ink);
+  color: #fff;
+}
+
+.project-left {
+  width: 40%;
+  min-width: 320px;
+  padding: 80px 40px 40px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: hidden;
+  z-index: 10;
+  }
+
+.project-card-box {
+  border: 1.5px solid var(--ink);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100%;
+  background: rgba(242, 237, 232, 0.92);
+}
+
+.project-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(24px, 3vw, 48px);
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: #fff;
+  padding: 3px 7px;
+}
+
+.project-description {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  opacity: 0.8;
+  flex: 1;
+  overflow-y: auto; 
+  min-height: 0;   
+}
+
+.project-meta {
+  display: flex;
+  gap: 32px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-top: 1px solid rgba(0,0,0,0.15);
+  padding-top: 16px;
+}
+
+.project-meta strong {
+  background: var(--ink);
+  color: #fff;
+  padding: 2px 5px;
+  margin-right: 6px;
+}
+
+/* ── Galería derecha ────────────────────────────── */
+.project-right {
+  width: 60%;
+  padding: 80px 40px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100vh;       
+  overflow-y: scroll;
+}
+
+.gallery-img {
+  width: 100%;
+  display: block;
+}
+
+/* ── Responsive ─────────────────────────────────── */
+@media (max-width: 740px) {
+  .project-layout {
+    position: relative;
+  }
+  
+  .project-right {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 1;
+    padding-top: 0;
+    margin-top: 0;
+  }
+
+  .project-left {
+    position: relative;
+    width: 100%;
+    min-width: unset;
+    height: auto;
+    overflow: hidden;
+    z-index: 10;
+    padding-bottom: 40px;
+  }
+
+  .project-card-box {
+    height: auto;
+    min-height: unset;
+  }
+}

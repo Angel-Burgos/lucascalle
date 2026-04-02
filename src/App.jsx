@@ -1,7 +1,11 @@
 import { useMemo, useRef, useEffect, useState } from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom'
+import { collection, getDocs, orderBy, query } from 'firebase/firestore'
+import { db } from './firebase'
 import ProjectCard from './components/ProjectCard'
-import projects from './config/projects'
+import Login from './pages/Login'
+import Admin from './pages/Admin'
+import ProtectedRoute from './components/ProtectedRoute'
 import './App.css'
 
 // ── Genera posiciones dispersas alrededor del centro ──────────────────────────
@@ -35,7 +39,17 @@ function generateLayout(count) {
 function ProjectPage() {
   const navigate = useNavigate()
   const id = window.location.pathname.split('/').pop()
-  const project = projects.find((p) => p.id === id)
+  const [project, setProject] = useState(null)
+
+  useEffect(() => {
+    async function load() {
+      const q = query(collection(db, 'projects'))
+      const snap = await getDocs(q)
+      const found = snap.docs.map(d => d.data()).find(p => p.id === id)
+      setProject(found || null)
+    }
+    load()
+  }, [id])
 
   if (!project) return (
     <div className="project-page">
@@ -74,11 +88,11 @@ function ProjectPage() {
 
       {/* ── Panel derecho — galería ── */}
       <section className="project-right">
+        <img src={project.imageUrl} alt={project.title} className="gallery-img" />
         {project.gallery?.length > 0
           ? project.gallery.map((img, i) => (
               <img key={i} src={img} alt={`${project.title} ${i + 1}`} className="gallery-img" />
-            ))
-          : <img src={project.image} alt={project.title} className="gallery-img" />
+            )) : <p className="no-gallery">No hay más imágenes para este proyecto.</p> 
         }
       </section>
 
@@ -87,15 +101,29 @@ function ProjectPage() {
 }
 // ── Home ──────────────────────────────────────────────────────────────────────
 function Home() {
+  const [visible, setVisible] = useState(false)
+  const [projects, setProjects] = useState([])
+  const [loadingProjects, setLoadingProjects] = useState(true)
   const featured = projects.find((p) => p.featured)
   const rest = projects.filter((p) => !p.featured)
-  const layout = useMemo(() => generateLayout(rest.length), [])
-  const [visible, setVisible] = useState(false)
+  const layout = useMemo(() => generateLayout(rest.length), [rest.length])
+  
+  useEffect(() => {
+    async function load() {
+      const q = query(collection(db, 'projects'), orderBy('year', 'desc'))
+      const snap = await getDocs(q)
+      setProjects(snap.docs.map((d) => ({ ...d.data() })))
+      setLoadingProjects(false)
+    }
+    load()
+  }, [])
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 80)
     return () => clearTimeout(t)
   }, [])
+
+  if (loadingProjects) return null
 
   return (
     <main className={`scatter-canvas ${visible ? 'visible' : ''}`}>
@@ -140,6 +168,10 @@ export default function App() {
     <Routes>
       <Route path="/"               element={<Home />} />
       <Route path="/project/:id"    element={<ProjectPage />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/admin" element={
+           <ProtectedRoute>   <Admin /> </ProtectedRoute> }
+      />      
     </Routes>
   )
 }

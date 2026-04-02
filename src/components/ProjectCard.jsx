@@ -26,7 +26,7 @@ export default function ProjectCard({ project, style }) {
       onKeyDown={(e) => e.key === 'Enter' && navigate(`/project/${project.id}`)}
     >
       <div className={styles.imageWrap}>
-        <img src={project.image} alt={project.title} draggable={false} />
+        <img src={project.imageUrl} alt={project.title} draggable={false} />
         <footer className={styles.footer}>
           <span className={styles.title}>{project.title}</span>
         </footer>

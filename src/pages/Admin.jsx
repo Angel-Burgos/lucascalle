@@ -292,7 +292,7 @@ const [statusAbout, setStatusAbout] = useState('')
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
                 {/* Botones / Links */}
                 <label className="admin-label">Links / Botones (texto|url, uno por línea)</label>                
-                <textarea className="admin-textarea" rows={3}
+                <textarea className="admin-textarea admin-textarea-fill" rows={3}
                   placeholder={"Behance|https://behance.net/...\nInstagram|https://instagram.com/..."}
                   value={form._buttonsInput || ''}
                   onChange={(e) => setForm((f) => ({ ...f, _buttonsInput: e.target.value }))} />

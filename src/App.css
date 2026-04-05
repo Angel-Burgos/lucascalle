@@ -185,8 +185,9 @@ a.project-link-btn:active {
 }
 
 .project-description {
+  white-space: pre-wrap;
   font-family: 'Switzer', sans-serif;
-  font-size: 12px;
+  font-size: 16px; /*12px*/
   line-height: 1.7;
   opacity: 0.8;
   flex: 1;

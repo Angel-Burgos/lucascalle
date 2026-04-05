@@ -1,0 +1,59 @@
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-box {
+  background: rgba(242, 237, 232, 0.95);
+  border: 1.5px solid #111;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.login-title {
+  font-family: 'Switzer', sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+.login-input {
+  font-family: 'Switzer', sans-serif;
+  font-size: 12px;
+  padding: 10px 12px;
+  border: 1.5px solid #111;
+  background: transparent;
+  outline: none;
+  letter-spacing: 0.04em;
+}
+
+.login-input:focus {
+  background: rgba(255,255,255,0.5);
+}
+
+.login-btn {
+  margin-top: 8px;
+  width: 100%;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.login-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.login-error {
+  font-family: 'Switzer', sans-serif;
+  font-size: 11px;
+  color: #c0392b;
+  letter-spacing: 0.04em;
+}

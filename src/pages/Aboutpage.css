@@ -1,0 +1,76 @@
+.about-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  cursor: default;
+}
+
+.about-nav {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 100;
+}
+
+.about-box {
+  display: grid;
+  padding: 48px 40px;
+  grid-template-columns: 1fr 2fr;
+  background: rgba(255, 255, 255, 1);
+  border: 2px solid #111;
+  box-shadow: 6px 8px 0 0 black;
+  max-width: 1000px;
+  width: 100%;
+}
+
+.about-left {
+  overflow: hidden;
+}
+
+.about-left img,
+.about-left video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.about-right {
+  padding: 0 0 0 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.about-text {
+  white-space: pre-wrap;
+  font-family: 'Switzer', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #111;
+}
+
+.about-buttons {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+.about-btn {
+  letter-spacing: 0.04em;
+  padding: 10px 0;
+}
+
+@media (max-width: 640px) {
+  .about-box {
+    grid-template-columns: 1fr;
+  }
+
+  .about-left {
+    max-height: 300px;
+  }
+}

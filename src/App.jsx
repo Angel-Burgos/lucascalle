@@ -1,8 +1,14 @@
 import { useMemo, useRef, useEffect, useState } from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom'
+import { collection, getDocs, orderBy, query } from 'firebase/firestore'
+import { db } from './firebase'
 import ProjectCard from './components/ProjectCard'
-import projects from './config/projects'
+import Login from './pages/Login'
+import Admin from './pages/Admin'
+import ProtectedRoute from './components/ProtectedRoute'
 import './App.css'
+import MediaItem from './components/MediaItem'
+import AboutPage from './pages/Aboutpage'
 
 // ── Genera posiciones dispersas alrededor del centro ──────────────────────────
 // Devuelve { left, top, rotate } en porcentajes/grados
@@ -35,7 +41,17 @@ function generateLayout(count) {
 function ProjectPage() {
   const navigate = useNavigate()
   const id = window.location.pathname.split('/').pop()
-  const project = projects.find((p) => p.id === id)
+  const [project, setProject] = useState(null)
+
+  useEffect(() => {
+    async function load() {
+      const q = query(collection(db, 'projects'))
+      const snap = await getDocs(q)
+      const found = snap.docs.map(d => d.data()).find(p => p.id === id)
+      setProject(found || null)
+    }
+    load()
+  }, [id])
 
   if (!project) return (
     <div className="project-page">
@@ -65,6 +81,15 @@ function ProjectPage() {
 
           <p className="project-description">{project.description}</p>
 
+          {project.buttons?.length > 0 && (
+            <div className="project-buttons">
+              {project.buttons.map((btn, i) => (
+                <a key={i} href={btn.url} target="_blank" rel="noreferrer" className="project-link-btn">
+                  {btn.label}
+                </a>
+              ))}
+            </div>
+          )}
           <footer className="project-meta">
             <span><strong>DATE</strong> {project.year}</span>
             <span><strong>FOR</strong> {project.client}</span>
@@ -75,11 +100,12 @@ function ProjectPage() {
       {/* ── Panel derecho — galería ── */}
       <section className="project-right">
         {project.gallery?.length > 0
-          ? project.gallery.map((img, i) => (
-              <img key={i} src={img} alt={`${project.title} ${i + 1}`} className="gallery-img" />
-            ))
-          : <img src={project.image} alt={project.title} className="gallery-img" />
+            ? project.gallery.map((url, i) => (
+            <MediaItem key={i} url={url} alt={`${project.title} ${i + 1}`} className="gallery-img" controls />
+          ))
+          : <p className="no-gallery">No hay más imágenes para este proyecto.</p>//<MediaItem url={project.imageUrl} alt={project.title} className="gallery-img" controls />
         }
+      
       </section>
 
     </div>
@@ -87,15 +113,29 @@ function ProjectPage() {
 }
 // ── Home ──────────────────────────────────────────────────────────────────────
 function Home() {
+  const [visible, setVisible] = useState(false)
+  const [projects, setProjects] = useState([])
+  const [loadingProjects, setLoadingProjects] = useState(true)
   const featured = projects.find((p) => p.featured)
   const rest = projects.filter((p) => !p.featured)
-  const layout = useMemo(() => generateLayout(rest.length), [])
-  const [visible, setVisible] = useState(false)
+  const layout = useMemo(() => generateLayout(rest.length), [rest.length])
+  
+  useEffect(() => {
+    async function load() {
+      const q = query(collection(db, 'projects'), orderBy('year', 'desc'))
+      const snap = await getDocs(q)
+      setProjects(snap.docs.map((d) => ({ ...d.data() })))
+      setLoadingProjects(false)
+    }
+    load()
+  }, [])
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 80)
     return () => clearTimeout(t)
   }, [])
+
+  if (loadingProjects) return null
 
   return (
     <main className={`scatter-canvas ${visible ? 'visible' : ''}`}>
@@ -121,13 +161,14 @@ function Home() {
         <ProjectCard
           key={featured.id}
           project={featured}
+          navigateTo="/about"
           style={{
             left: '50%',
             top: '50%',
             transform: 'translate(-50%, -50%)',
             zIndex: 50,
             opacity: visible ? 1 : 0,
-          }}
+          }}          
         />
       )}
     </main>
@@ -140,6 +181,11 @@ export default function App() {
     <Routes>
       <Route path="/"               element={<Home />} />
       <Route path="/project/:id"    element={<ProjectPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/admin" element={
+           <ProtectedRoute>   <Admin /> </ProtectedRoute> }
+      />      
     </Routes>
   )
 }

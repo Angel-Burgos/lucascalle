@@ -1,6 +1,6 @@
 .admin-page {
   min-height: 100vh;
-  font-family: 'Switzer', monospace;
+  font-family: 'Switzer', sans-serif;
   cursor: default;
 }
 
@@ -31,6 +31,7 @@
 .admin-body {
   display: grid;
   grid-template-columns: 480px 1fr;
+  grid-template-rows: auto auto;
   gap: 40px;
   padding: 40px;
   align-items: start;
@@ -69,6 +70,16 @@
   padding: 32px;
 }
 
+.admin-about-section {
+  background: rgba(242, 237, 232, 0.92);
+  border: 1.5px solid #111;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  grid-column: 1;
+}
+
 /* ── Labels ── */
 .admin-label {
   font-size: 10px;
@@ -80,7 +91,7 @@
 
 /* ── Inputs ── */
 .admin-input {
-  font-family: 'Switzer', monospace;
+  font-family: 'Switzer', sans-serif;
   font-size: 12px;
   padding: 8px 10px;
   border: 1.5px solid #111;
@@ -94,7 +105,7 @@
 }
 
 .admin-textarea {
-  font-family: 'Switzer', monospace;
+  font-family: 'Switzer', sans-serif;
   font-size: 12px;
   padding: 8px 10px;
   border: 1.5px solid #111;
@@ -116,6 +127,19 @@
 }
 
 /* ── Layouts ── */
+.admin-row-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.admin-top-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .admin-row-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -143,29 +167,27 @@
   gap: 6px;
   align-content: flex-start;
   overflow-y: auto;
-  height: 150px;
+  height: 130px;
 }
 
 .admin-tag-btn {
-  font-family: 'Switzer', monospace;
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  border: 1.5px solid #111;
-  background: transparent;
   padding: 4px 8px;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
   height: fit-content;
 }
 
 .admin-tag-btn.selected {
   background: #111;
   color: #fff;
+  transform: none;
+  box-shadow: none;
 }
 
 .admin-tag-btn:hover:not(.selected) {
-  background: rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px) translateX(-2px);
+  box-shadow: 2px 5px 0 0 black;
 }
 
 /* ── URL con icono ── */
@@ -207,7 +229,8 @@
   height: 72px;
 }
 
-.admin-gallery-thumb img {
+.admin-gallery-thumb img,
+.admin-gallery-thumb video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -220,15 +243,24 @@
   right: 2px;
   background: #111;
   color: #fff;
-  border: none;
+  border: 1px solid #111;
   font-size: 9px;
   width: 16px;
   height: 16px;
-  cursor: pointer;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  /* override global button style para este botón pequeño */
+  transform: none !important;
+  box-shadow: none !important;
+  transition: opacity 0.2s;
+}
+
+.admin-gallery-delete:hover {
+  opacity: 0.7;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* ── Botones ── */
@@ -239,56 +271,58 @@
 }
 
 .admin-btn-primary {
-  font-family: 'Switzer', monospace;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   background: #111;
   color: #fff;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  transition: opacity 0.2s;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   flex: 1;
 }
 
-.admin-btn-primary:hover { opacity: 0.75; }
-.admin-btn-primary:disabled { opacity: 0.35; cursor: default; }
-
-.admin-btn-ghost {
-  font-family: 'Switzer', monospace;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  background: none;
-  color: #111;
-  border: 1.5px solid #111;
-  padding: 8px 16px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+.admin-btn-primary:hover {
+  background: #333;
+  color: #fff;
 }
 
-.admin-btn-ghost:hover {
+.admin-btn-primary:disabled {
+  opacity: 0.35;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.admin-btn-ghost {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-btn-ghost.active {
   background: #111;
   color: #fff;
 }
 
 .admin-btn-danger {
-  font-family: 'Switzer', monospace;
-  font-size: 11px;
+  color: #c0392b;
+  border-color: #c0392b;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  background: none;
-  color: #c0392b;
-  border: 1.5px solid #c0392b;
-  padding: 8px 16px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
 }
 
 .admin-btn-danger:hover {
   background: #c0392b;
   color: #fff;
+  box-shadow: 2px 5px 0 0 #c0392b;
+}
+
+/* ── Mode toggle ── */
+.admin-mode-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.admin-mode-toggle .admin-section-title {
+  margin-bottom: 0;
 }
 
 /* ── Tabla ── */
@@ -344,53 +378,6 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  font-family: 'Switzer', monospace;
+  font-family: 'Switzer', sans-serif;
   opacity: 0.4;
-}
-.admin-row-top {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  align-items: start;
-}
-
-.admin-top-left {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.admin-body {
-  display: grid;
-  grid-template-columns: 480px 1fr;
-  grid-template-rows: auto auto;
-  gap: 40px;
-  padding: 40px;
-  align-items: start;
-}
-
-.admin-about-section {
-  background: rgba(242, 237, 232, 0.92);
-  border: 1.5px solid #111;
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  grid-column: 1;  /* misma columna que el formulario */
-}
-
-.admin-mode-toggle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.admin-mode-toggle .admin-section-title {
-  margin-bottom: 0;
-}
-
-.admin-btn-ghost.active {
-  background: #111;
-  color: #fff;
 }

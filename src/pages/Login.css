@@ -24,7 +24,7 @@
 }
 
 .login-input {
-  font-family: 'Switzer', monospace;
+  font-family: 'Switzer', sans-serif;
   font-size: 12px;
   padding: 10px 12px;
   border: 1.5px solid #111;
@@ -38,30 +38,21 @@
 }
 
 .login-btn {
-  font-family: 'Switzer', monospace;
-  font-size: 11px;
+  margin-top: 8px;
+  width: 100%;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  background: #111;
-  color: #fff;
-  border: none;
-  padding: 12px;
-  cursor: pointer;
-  margin-top: 8px;
-  transition: opacity 0.2s;
-}
-
-.login-btn:hover {
-  opacity: 0.75;
 }
 
 .login-btn:disabled {
   opacity: 0.4;
   cursor: default;
+  transform: none;
+  box-shadow: none;
 }
 
 .login-error {
-  font-family: 'Switzer', monospace;
+  font-family: 'Switzer', sans-serif;
   font-size: 11px;
   color: #c0392b;
   letter-spacing: 0.04em;

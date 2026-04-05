@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
 import { signOut } from 'firebase/auth'
-import {
-  collection, getDocs, addDoc, updateDoc, deleteDoc, doc, orderBy, query
-} from 'firebase/firestore'
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, orderBy, query, getDoc, setDoc } from 'firebase/firestore'
 import { useNavigate } from 'react-router-dom'
 import { auth, db } from '../firebase'
 import './Admin.css'
+import MediaItem from '../components/MediaItem'
 
 const EMPTY_FORM = {
   id: '',
@@ -18,12 +17,14 @@ const EMPTY_FORM = {
   imageUrl: '',
   gallery: [],
   _galleryInput: '',
+  buttons: [],
+  _buttonsInput: '',
 }
 
 const ALL_TAGS = [
-  'Branding', 'Editorial Design', 'Motion Graphics',
-  'Web Design', 'RRSS', 'Illustration', 'Typography',
-  'Packaging', 'Photography', 'UI/UX'
+  'Branding', 'Editorial Design', 'Illustration', 'Hand made',
+  'Motion Graphics','Packaging', 'Photography', 'Prototyping',
+  'RRSS', 'Typography','Video editing', 'UI/UX','Web Design'
 ]
 
 // Convierte URL de Google Drive al formato directo para <img>
@@ -41,6 +42,19 @@ export default function Admin() {
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
   const [status, setStatus] = useState('')
+  const [mode, setMode] = useState('project') // 'project' | 'about'
+  const [about, setAbout] = useState({
+        imageUrl: '',
+        text: '',
+        buttons: [
+          { label: 'email', url: '' },
+          { label: 'ig', url: '' },
+          { label: 'behance', url: '' },
+          { label: 'CV', url: '' },
+          ],
+        })
+const [savingAbout, setSavingAbout] = useState(false)
+const [statusAbout, setStatusAbout] = useState('')
 
   // ── Cargar proyectos ──────────────────────────────────
   async function loadProjects() {
@@ -50,8 +64,42 @@ export default function Admin() {
     setProjects(snap.docs.map((d) => ({ docId: d.id, ...d.data() })))
     setLoading(false)
   }
+  async function loadAbout() {
+    const snap = await getDoc(doc(db, 'config', 'about'))
+    if (snap.exists()) {
+      const data = snap.data()
+      setAbout({
+        ...data,
+        buttons: data.buttons || [
+          { label: 'email', url: '' },
+          { label: 'ig', url: '' },
+          { label: 'behance', url: '' },
+          { label: 'CV', url: '' },
+        ]
+      })
+    }
+  }
 
-  useEffect(() => { loadProjects() }, [])
+  async function handleSaveAbout() {
+    setSavingAbout(true)
+    setStatusAbout('Guardando...')
+    try {
+      await setDoc(doc(db, 'config', 'about'), {
+        ...about,
+        imageUrl: driveUrl(about.imageUrl),
+      })
+      setStatusAbout('About actualizado ✓')
+    } catch (e) {
+      setStatusAbout('Error: ' + e.message)
+    } finally {
+      setSavingAbout(false)
+    }
+  }
+
+
+  useEffect(() => { loadProjects()
+                    loadAbout()
+                   }, [])
 
   // ── Toggle tag ────────────────────────────────────────
   function toggleTag(tag) {
@@ -77,6 +125,14 @@ export default function Admin() {
       const newGalleryUrls = form._galleryInput
         ? form._galleryInput.split('\n').map((u) => driveUrl(u.trim())).filter(Boolean)
         : []
+      
+      const newButtons = form._buttonsInput
+        ? form._buttonsInput.split('\n').map(line => {
+              const [label, url] = line.split('|').map(s => s.trim())
+              return label && url ? { label, url } : null
+            })
+            .filter(Boolean)
+        : []
 
       const data = {
         id: form.id,
@@ -88,6 +144,7 @@ export default function Admin() {
         size: form.size,
         imageUrl: driveUrl(form.imageUrl),
         gallery: [...(form.gallery || []), ...newGalleryUrls],
+        buttons: newButtons.length ? newButtons : (form.buttons || []),
       }
 
       if (editing) {
@@ -115,6 +172,7 @@ export default function Admin() {
       ...project,
       tags: (project.tags || []).join(', '),
       _galleryInput: '',
+      _buttonsInput: (project.buttons || []).map(b => `${b.label}|${b.url}`).join('\n'),
     })
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -161,111 +219,186 @@ export default function Admin() {
 
         {/* ── Formulario ── */}
         <section className="admin-form-section">
-          <h2 className="admin-section-title">
-            {editing ? 'Editar proyecto' : 'Nuevo proyecto'}
-          </h2>
-
-          {/* Título */}
-          <label className="admin-label">Título</label>
-          <input className="admin-input" value={form.title}
-            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />
-
-          {/* Cliente + Año + Tags / Tamaño + ID + Tags */}
-          <div className="admin-row-top">
-            <div className="admin-top-left">
-              <div className="admin-row-halves">
-                <div className="admin-col">
-                  <label className="admin-label">Cliente</label>
-                  <input className="admin-input" value={form.client}
-                    onChange={(e) => setForm((f) => ({ ...f, client: e.target.value }))} />
-                </div>
-                <div className="admin-col">
-                  <label className="admin-label">Año</label>
-                  <input className="admin-input" type="number" value={form.year}
-                    onChange={(e) => setForm((f) => ({ ...f, year: e.target.value }))} />
-                </div>
-              </div>
-              <div className="admin-row-halves">
-                <div className="admin-col">
-                  <label className="admin-label">Tamaño</label>
-                  <select className="admin-input" value={form.size}
-                    onChange={(e) => setForm((f) => ({ ...f, size: e.target.value }))}>
-                    <option value="sm">sm</option>
-                    <option value="md">md</option>
-                    <option value="lg">lg</option>
-                  </select>
-                </div>
-                <div className="admin-col">
-                  <label className="admin-label">ID (URL)</label>
-                  <input className="admin-input" value={form.id}
-                    placeholder="ej: su-rant"
-                    onChange={(e) => setForm((f) => ({ ...f, id: e.target.value }))} />
-                </div>
-              </div>
-            </div>
-
-            <div className="admin-col">
-              <label className="admin-label">Tags</label>
-              <div className="admin-tags-list">
-                {ALL_TAGS.map((tag) => (
-                  <button key={tag} type="button"
-                    className={`admin-tag-btn ${selectedTags.includes(tag) ? 'selected' : ''}`}
-                    onClick={() => toggleTag(tag)}>
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Descripción */}
-          <label className="admin-label">Descripción</label>
-          <textarea className="admin-textarea admin-textarea-fill" value={form.description}
-            onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
-
-          {/* Imagen principal */}
-          <label className="admin-label">URL imagen principal (Google Drive)</label>
-          <div className="admin-url-row">
-            <input className="admin-input" value={form.imageUrl}
-              placeholder="https://drive.google.com/file/d/ABC123/view"
-              onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))} />
-            {form.imageUrl && (
-              <a href={form.imageUrl} target="_blank" rel="noreferrer"
-                className="admin-url-open" title="Abrir imagen">↗</a>
-            )}
-          </div>
-
-          {/* Galería */}
-          <label className="admin-label">Galería — imágenes actuales</label>
-          <div className="admin-gallery-preview admin-gallery-scroll">
-            {form.gallery?.map((url, i) => (
-              <div key={i} className="admin-gallery-thumb">
-                <img src={url} alt={`gallery ${i}`} />
-                <button className="admin-gallery-delete"
-                  onClick={() => handleDeleteGalleryImage(i)}>✕</button>
-              </div>
-            ))}
-          </div>
-
-          <label className="admin-label">Añadir URLs galería (una por línea)</label>
-          <textarea className="admin-textarea" rows={3}
-            placeholder={"https://drive.google.com/file/d/ABC1/view\nhttps://drive.google.com/file/d/ABC2/view"}
-            value={form._galleryInput || ''}
-            onChange={(e) => setForm((f) => ({ ...f, _galleryInput: e.target.value }))} />
-
-          {status && <p className="admin-status">{status}</p>}
-
-          <div className="admin-form-actions">
-            {editing && (
-              <button className="admin-btn-ghost"
-                onClick={() => { setForm(EMPTY_FORM); setEditing(null); setStatus('') }}>
-                Cancelar
-              </button>
-            )}
-            <button className="admin-btn-primary" onClick={handleSave} disabled={saving}>
-              {saving ? 'Guardando...' : editing ? 'Guardar cambios' : 'Crear proyecto'}
+          <div className="admin-mode-toggle">
+            <h2 className="admin-section-title">
+              {mode === 'about' ? 'About' : editing ? 'Editar proyecto' : 'Nuevo proyecto'}
+            </h2>
+            <button
+              className={`admin-btn-ghost ${mode === 'about' ? 'active' : ''}`}
+              onClick={() => { setMode(mode === 'about' ? 'project' : 'about'); setStatus(''); setStatusAbout('') }}
+            >
+              {mode === 'about' ? 'Proyectos' : 'About'}
             </button>
           </div>
+          {mode === 'project' ? (
+             <>
+      
+                {/* Título */}
+                <label className="admin-label">Título</label>
+                <input className="admin-input" value={form.title}
+                  onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />
+
+                {/* Cliente + Año + Tags / Tamaño + ID + Tags */}
+                <div className="admin-row-top">
+                  <div className="admin-top-left">
+                    <div className="admin-row-halves">
+                      <div className="admin-col">
+                        <label className="admin-label">Cliente</label>
+                        <input className="admin-input" value={form.client}
+                          onChange={(e) => setForm((f) => ({ ...f, client: e.target.value }))} />
+                      </div>
+                      <div className="admin-col">
+                        <label className="admin-label">Año</label>
+                        <input className="admin-input" type="number" value={form.year}
+                          onChange={(e) => setForm((f) => ({ ...f, year: e.target.value }))} />
+                      </div>
+                    </div>
+                    <div className="admin-row-halves">
+                      <div className="admin-col">
+                        <label className="admin-label">Tamaño</label>
+                        <select className="admin-input" value={form.size}
+                          onChange={(e) => setForm((f) => ({ ...f, size: e.target.value }))}>
+                          <option value="sm">sm</option>
+                          <option value="md">md</option>
+                          <option value="lg">lg</option>
+                        </select>
+                      </div>
+                      <div className="admin-col">
+                        <label className="admin-label">ID (URL)</label>
+                        <input className="admin-input" value={form.id}
+                          placeholder="ej: su-rant"
+                          onChange={(e) => setForm((f) => ({ ...f, id: e.target.value }))} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="admin-col">
+                    <label className="admin-label">Tags</label>
+                    <div className="admin-tags-list">
+                      {ALL_TAGS.map((tag) => (
+                        <button key={tag} type="button"
+                          className={`admin-tag-btn ${selectedTags.includes(tag) ? 'selected' : ''}`}
+                          onClick={() => toggleTag(tag)}>
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Descripción */}
+                <label className="admin-label">Descripción</label>
+                <textarea className="admin-textarea admin-textarea-fill" value={form.description}
+                  onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+                {/* Botones / Links */}
+                <label className="admin-label">Links / Botones (texto|url, uno por línea)</label>                
+                <textarea className="admin-textarea" rows={3}
+                  placeholder={"Behance|https://behance.net/...\nInstagram|https://instagram.com/..."}
+                  value={form._buttonsInput || ''}
+                  onChange={(e) => setForm((f) => ({ ...f, _buttonsInput: e.target.value }))} />
+
+                {/* Imagen principal */}
+                <label className="admin-label">URL imagen principal (Google Drive)</label>
+                <div className="admin-url-row">
+                  <input className="admin-input" value={form.imageUrl}
+                    placeholder="https://drive.google.com/file/d/ABC123/view"
+                    onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))} />
+                  {form.imageUrl && (
+                    <a href={form.imageUrl} target="_blank" rel="noreferrer"
+                      className="admin-url-open" title="Abrir imagen">↗</a>
+                  )}
+                </div>
+
+                {/* Galería */}
+                <label className="admin-label">Galería — imágenes actuales</label>
+                <div className="admin-gallery-preview admin-gallery-scroll">
+                  {form.gallery?.map((url, i) => (
+                    <div key={i} className="admin-gallery-thumb">
+                      <MediaItem url={url} alt={`gallery ${i}`} muted />
+                      <button className="admin-gallery-delete"
+                        onClick={() => handleDeleteGalleryImage(i)}>✕</button>
+                    </div>
+                  ))}
+                </div>
+
+                <label className="admin-label">Añadir URLs galería (una por línea)</label>
+                <textarea className="admin-textarea" rows={3}
+                  placeholder={"https://drive.google.com/file/d/ABC1/view\nhttps://drive.google.com/file/d/ABC2/view"}
+                  value={form._galleryInput || ''}
+                  onChange={(e) => setForm((f) => ({ ...f, _galleryInput: e.target.value }))} />
+
+                {status && <p className="admin-status">{status}</p>}
+
+                <div className="admin-form-actions">
+                  {editing && (
+                    <button className="admin-btn-ghost"
+                      onClick={() => { setForm(EMPTY_FORM); setEditing(null); setStatus('') }}>
+                      Cancelar
+                    </button>
+                  )}
+                  <button className="admin-btn-primary" onClick={handleSave} disabled={saving}>
+                    {saving ? 'Guardando...' : editing ? 'Guardar cambios' : 'Crear proyecto'}
+                  </button>
+                </div>
+              </>
+          ) : (
+            <>
+              <label className="admin-label">URL imagen (Google Drive / Cloudinary)</label>
+              <div className="admin-url-row">
+                <input className="admin-input" value={about.imageUrl}
+                  placeholder="https://..."
+                  onChange={(e) => setAbout((a) => ({ ...a, imageUrl: e.target.value }))} />
+                {about.imageUrl && (
+                  <a href={about.imageUrl} target="_blank" rel="noreferrer"
+                    className="admin-url-open" title="Abrir imagen">↗</a>
+                )}
+              </div>
+
+              <label className="admin-label">Texto</label>
+              <textarea className="admin-textarea" rows={5} value={about.text}
+                onChange={(e) => setAbout((a) => ({ ...a, text: e.target.value }))} />
+
+              <label className="admin-label">Botones</label>
+              {about.buttons.map((btn, i) => (
+                <div key={i} className="admin-row-halves" style={{ marginBottom: 8 }}>
+                  <input className="admin-input" value={btn.label}
+                    placeholder="Texto botón"
+                    onChange={(e) => {
+                      const next = [...about.buttons]
+                      next[i] = { ...next[i], label: e.target.value }
+                      setAbout((a) => ({ ...a, buttons: next }))
+                    }} />
+                  <input className="admin-input" value={btn.url}
+                    placeholder="https://..."
+                    onChange={(e) => {
+                      const next = [...about.buttons]
+                      next[i] = { ...next[i], url: e.target.value }
+                      setAbout((a) => ({ ...a, buttons: next }))
+                    }} />
+                </div>
+              ))}
+
+              <button className="admin-btn-ghost" style={{ marginTop: 8 }}
+                onClick={() => setAbout((a) => ({
+                  ...a, buttons: [...a.buttons, { label: '', url: '' }]
+                }))}>
+                + Añadir botón
+              </button>
+
+              {statusAbout && <p className="admin-status">{statusAbout}</p>}
+
+              <div className="admin-form-actions">
+                <button className="admin-btn-ghost" onClick={() => setMode('project')}>
+                  Cancelar
+                </button>
+                <button className="admin-btn-primary" onClick={async () => { await handleSaveAbout(); setMode('project') }} disabled={savingAbout}>
+                  {savingAbout ? 'Guardando...' : 'Guardar about'}
+                </button>
+              </div>
+            </> 
+       
+          )}
+
         </section>
 
         {/* ── Lista de proyectos ── */}
@@ -289,8 +422,12 @@ export default function Admin() {
                   <tr key={p.docId}>
                     <td>
                       {p.imageUrl && (
-                        <img src={p.imageUrl} alt={p.title} className="admin-table-thumb" />
-                      )}
+                        <MediaItem
+                          url={p.imageUrl}
+                          alt={p.title}
+                          className="admin-table-thumb"
+                          muted />                      
+                        )}
                     </td>
                     <td>{p.title}</td>
                     <td>{p.year}</td>
@@ -306,6 +443,7 @@ export default function Admin() {
           )}
         </section>
 
+       
       </div>
     </div>
   )

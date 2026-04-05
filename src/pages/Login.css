@@ -17,14 +17,14 @@
 }
 
 .login-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Switzer', sans-serif;
   font-size: 32px;
   font-weight: 400;
   margin-bottom: 8px;
 }
 
 .login-input {
-  font-family: 'DM Mono', monospace;
+  font-family: 'Switzer', monospace;
   font-size: 12px;
   padding: 10px 12px;
   border: 1.5px solid #111;
@@ -38,7 +38,7 @@
 }
 
 .login-btn {
-  font-family: 'DM Mono', monospace;
+  font-family: 'Switzer', monospace;
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -61,7 +61,7 @@
 }
 
 .login-error {
-  font-family: 'DM Mono', monospace;
+  font-family: 'Switzer', monospace;
   font-size: 11px;
   color: #c0392b;
   letter-spacing: 0.04em;

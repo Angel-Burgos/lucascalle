@@ -7,6 +7,8 @@ import Login from './pages/Login'
 import Admin from './pages/Admin'
 import ProtectedRoute from './components/ProtectedRoute'
 import './App.css'
+import MediaItem from './components/MediaItem'
+import AboutPage from './pages/Aboutpage'
 
 // ── Genera posiciones dispersas alrededor del centro ──────────────────────────
 // Devuelve { left, top, rotate } en porcentajes/grados
@@ -79,6 +81,15 @@ function ProjectPage() {
 
           <p className="project-description">{project.description}</p>
 
+          {project.buttons?.length > 0 && (
+            <div className="project-buttons">
+              {project.buttons.map((btn, i) => (
+                <a key={i} href={btn.url} target="_blank" rel="noreferrer" className="project-link-btn">
+                  {btn.label}
+                </a>
+              ))}
+            </div>
+          )}
           <footer className="project-meta">
             <span><strong>DATE</strong> {project.year}</span>
             <span><strong>FOR</strong> {project.client}</span>
@@ -88,12 +99,13 @@ function ProjectPage() {
 
       {/* ── Panel derecho — galería ── */}
       <section className="project-right">
-        <img src={project.imageUrl} alt={project.title} className="gallery-img" />
         {project.gallery?.length > 0
-          ? project.gallery.map((img, i) => (
-              <img key={i} src={img} alt={`${project.title} ${i + 1}`} className="gallery-img" />
-            )) : <p className="no-gallery">No hay más imágenes para este proyecto.</p> 
+            ? project.gallery.map((url, i) => (
+            <MediaItem key={i} url={url} alt={`${project.title} ${i + 1}`} className="gallery-img" controls />
+          ))
+          : <p className="no-gallery">No hay más imágenes para este proyecto.</p>//<MediaItem url={project.imageUrl} alt={project.title} className="gallery-img" controls />
         }
+      
       </section>
 
     </div>
@@ -149,13 +161,14 @@ function Home() {
         <ProjectCard
           key={featured.id}
           project={featured}
+          navigateTo="/about"
           style={{
             left: '50%',
             top: '50%',
             transform: 'translate(-50%, -50%)',
             zIndex: 50,
             opacity: visible ? 1 : 0,
-          }}
+          }}          
         />
       )}
     </main>
@@ -168,6 +181,7 @@ export default function App() {
     <Routes>
       <Route path="/"               element={<Home />} />
       <Route path="/project/:id"    element={<ProjectPage />} />
+      <Route path="/about" element={<AboutPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/admin" element={
            <ProtectedRoute>   <Admin /> </ProtectedRoute> }

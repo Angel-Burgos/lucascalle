@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import styles from './ProjectCard.module.css'
+import MediaItem from './MediaItem'
 
 // Tamaños base en px (escalan con CSS clamp)
 const SIZE_MAP = {
@@ -8,7 +9,7 @@ const SIZE_MAP = {
   lg: { w: 360, h: 460 },
 }
 
-export default function ProjectCard({ project, style }) {
+export default function ProjectCard({ project, style, navigateTo }) {
   const navigate = useNavigate()
   const { w, h } = SIZE_MAP[project.size] ?? SIZE_MAP.md
 
@@ -20,13 +21,21 @@ export default function ProjectCard({ project, style }) {
         '--h': `${h}px`,
         ...style,
       }}
-      onClick={() => navigate(`/project/${project.id}`)}
+      onClick={() => navigate(navigateTo ?? `/project/${project.id}`)}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && navigate(`/project/${project.id}`)}
+      onKeyDown={(e) => e.key === 'Enter' && navigate(navigateTo ?? `/project/${project.id}`)}
     >
       <div className={styles.imageWrap}>
-        <img src={project.imageUrl} alt={project.title} draggable={false} />
+        <MediaItem
+          url={project.imageUrl}
+          alt={project.title}
+          draggable={false}
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
         <footer className={styles.footer}>
           <span className={styles.title}>{project.title}</span>
         </footer>

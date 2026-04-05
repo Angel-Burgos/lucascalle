@@ -1,6 +1,6 @@
 .admin-page {
   min-height: 100vh;
-  font-family: 'DM Mono', monospace;
+  font-family: 'Switzer', monospace;
   cursor: default;
 }
 
@@ -18,7 +18,7 @@
 }
 
 .admin-logo {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Switzer', sans-serif;
   font-size: 20px;
 }
 
@@ -44,7 +44,7 @@
 
 /* ── Secciones ── */
 .admin-section-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Switzer', sans-serif;
   font-size: 20px;
   font-weight: 400;
   margin-bottom: 24px;
@@ -80,7 +80,7 @@
 
 /* ── Inputs ── */
 .admin-input {
-  font-family: 'DM Mono', monospace;
+  font-family: 'Switzer', monospace;
   font-size: 12px;
   padding: 8px 10px;
   border: 1.5px solid #111;
@@ -94,7 +94,7 @@
 }
 
 .admin-textarea {
-  font-family: 'DM Mono', monospace;
+  font-family: 'Switzer', monospace;
   font-size: 12px;
   padding: 8px 10px;
   border: 1.5px solid #111;
@@ -147,7 +147,7 @@
 }
 
 .admin-tag-btn {
-  font-family: 'DM Mono', monospace;
+  font-family: 'Switzer', monospace;
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -239,7 +239,7 @@
 }
 
 .admin-btn-primary {
-  font-family: 'DM Mono', monospace;
+  font-family: 'Switzer', monospace;
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -256,7 +256,7 @@
 .admin-btn-primary:disabled { opacity: 0.35; cursor: default; }
 
 .admin-btn-ghost {
-  font-family: 'DM Mono', monospace;
+  font-family: 'Switzer', monospace;
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -274,7 +274,7 @@
 }
 
 .admin-btn-danger {
-  font-family: 'DM Mono', monospace;
+  font-family: 'Switzer', monospace;
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -344,7 +344,7 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  font-family: 'DM Mono', monospace;
+  font-family: 'Switzer', monospace;
   opacity: 0.4;
 }
 .admin-row-top {
@@ -358,4 +358,39 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.admin-body {
+  display: grid;
+  grid-template-columns: 480px 1fr;
+  grid-template-rows: auto auto;
+  gap: 40px;
+  padding: 40px;
+  align-items: start;
+}
+
+.admin-about-section {
+  background: rgba(242, 237, 232, 0.92);
+  border: 1.5px solid #111;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  grid-column: 1;  /* misma columna que el formulario */
+}
+
+.admin-mode-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.admin-mode-toggle .admin-section-title {
+  margin-bottom: 0;
+}
+
+.admin-btn-ghost.active {
+  background: #111;
+  color: #fff;
 }
